@@ -7,8 +7,11 @@ const dbMessages = require('./constants/dbMessages');
 require('dotenv')
   .config();
 
+const router = require('./router');
+
 app.use(express.json());
 app.use(cors());
+app.use(router);
 
 const connectionParams = {
   useNewUrlParser: true,

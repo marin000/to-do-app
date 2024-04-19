@@ -1,6 +1,7 @@
 const Todos = require('../Models/Todos');
 const { validationResult } = require('express-validator');
 const { v4: uuidv4 } = require('uuid');
+const errorMessages = require('../constants/errorMessages');
 
 const create = async (req, res) => {
   try {
@@ -18,10 +19,61 @@ const create = async (req, res) => {
   }
 }
 
-const fetch = async (_req, res) => {
+const fetch = async (req, res) => {
   try {
-    const data = await Todos.find({});
+    const errors = validationResult(req)
+    if (!errors.isEmpty()) {
+      return res.status(403).json({ errors: errors.array() });
+    }
+
+    const sortOrder = req.query.sort === 'ASC' ? { createdAt: 1 } : { createdAt: -1 };
+    const data = await Todos.find({}).sort(sortOrder);
     res.status(200).json(data);
+  } catch (err) {
+    res.status(500).json({ error: err.message, metadata: err.stack });
+  }
+}
+
+const getById = async (req, res) => {
+  try {
+    const errors = validationResult(req)
+    if (!errors.isEmpty()) {
+      return res.status(403).json({ errors: errors.array() });
+    }
+
+    const todo = await Todos.findById(req.params.id);
+    if (!todo) {
+      return res.status(404).json({ error: errorMessages.TODO_NOT_FOUND });
+    }
+    res.status(200).json(todo);
+  } catch (err) {
+    res.status(500).json({ error: err.message, metadata: err.stack });
+  }
+}
+
+async function update(req, res) {
+  try {
+    const errors = validationResult(req)
+    if (!errors.isEmpty()) {
+      return res.status(403).json({ errors: errors.array() });
+    }
+
+    const todo = await Todos.findById(req.params.id);
+    if (!todo) {
+      return res.status(404).json({ error: errorMessages.TODO_NOT_FOUND });
+    }
+
+    const { text, done } = req.body;
+    if (text) {
+      todo.text = text;
+    }
+
+    if (typeof done === 'boolean') {
+      todo.done = done;
+    }
+
+    const updatedTodo = await todo.save();
+    res.status(200).json(updatedTodo);
   } catch (err) {
     res.status(500).json({ error: err.message, metadata: err.stack });
   }
@@ -29,5 +81,7 @@ const fetch = async (_req, res) => {
 
 module.exports = {
   create,
-  fetch
+  fetch,
+  getById,
+  update
 };

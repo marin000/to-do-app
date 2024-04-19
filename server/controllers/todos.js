@@ -2,6 +2,7 @@ const Todos = require('../Models/Todos');
 const { validationResult } = require('express-validator');
 const { v4: uuidv4 } = require('uuid');
 const errorMessages = require('../constants/errorMessages');
+const { sendSMS } = require('../services/sms');
 
 const create = async (req, res) => {
   try {
@@ -70,6 +71,7 @@ async function update(req, res) {
 
     if (typeof done === 'boolean') {
       todo.done = done;
+      if (done) sendSMS(todo.text);
     }
 
     const updatedTodo = await todo.save();

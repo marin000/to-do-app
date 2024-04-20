@@ -1,5 +1,8 @@
 export const todo = {
   title: 'My Tasks',
   addTodo: 'Add New Task',
-  buttonAdd: 'Add'
+  noTasks: 'You have no new tasks',
+  buttonAdd: 'Add',
+  editTodo: 'Edit Task',
+  buttonConfirm: 'Confirm'
 }

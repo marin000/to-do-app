@@ -1,0 +1,22 @@
+.modal-container {
+  position: absolute !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  width: 40%;
+  box-shadow: 24px !important;
+  padding: 25px !important;
+  border-radius: 15px !important;
+}
+
+@media (max-width: 900px) {
+  .modal-container {
+    width: 75%;
+  }
+}
+
+.modal-close {
+  position: absolute !important;
+  top: 5px !important;
+  right: 5px !important;
+}

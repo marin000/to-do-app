@@ -1,39 +1,75 @@
 import { useState, useEffect } from "react";
-import { Box, Typography, useTheme, IconButton } from "@mui/material";
+import { Link } from 'react-router-dom';
+import { Box, Typography, useTheme, IconButton, CircularProgress } from "@mui/material";
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { todo } from "../../constants/todo";
 import apiTodo from '../../api/todo';
 import DataTable from "../../components/dataTable";
 import './todo.css';
-import AddTodoModal from "../../components/addTodoModal";
+import AddTodoModal from "../../components/addModal";
 
 export default function Todo() {
   const theme = useTheme();
+  const { noTasks, title } = todo;
   const [todos, setTodos] = useState(null);
   const [openAddModal, setOpenAddModal] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
+  const getAllTasks = () => {
     apiTodo.getTodos()
       .then((res) => {
         setTodos(res.data);
+        setLoading(false);
       })
       .catch((err) => {
         console.log(err);
+        setLoading(false);
       });
-  }, [todos]);
+  }
 
-  const handleCheck = (taskId, check) => {
-    const data = {
-      done: check
-    };
+  useEffect(() => {
+    setLoading(true);
+    getAllTasks();
+  }, []);
+
+  const handleAddTask = (text) => {
+    const data = { text: text };
+    apiTodo
+      .createTodo(data)
+      .then((res) => {
+        console.log('Todo created successfully:', res.data);
+        getAllTasks();
+      })
+      .catch((err) => {
+        alert(err.response.data.errors[0].msg);
+        console.log(err);
+      });
+  };
+
+  const handleEditTodo = (taskId, data) => {
     apiTodo.updateTodo(taskId, data)
       .then((res) => {
         console.log("Todo updated successfully:", res.data);
+        getAllTasks();
       })
       .catch((err) => {
+        alert(err.response.data.errors[0].msg);
         console.log(err);
       });
-  }
+  };
+
+  const handleDeleteTodo = (taskId) => {
+    apiTodo.deleteTodo(taskId)
+      .then(() => {
+        console.log("Todo deleted successfully:");
+        getAllTasks();
+      })
+      .catch((err) => {
+        alert(err.response.data.errors[0].msg);
+        console.log(err);
+      });
+  };
 
   const handleOpenModal = () => {
     setOpenAddModal(true);
@@ -43,21 +79,36 @@ export default function Todo() {
     setOpenAddModal(false);
   };
 
+  if (loading) {
+    <Box sx={{ display: 'flex' }}>
+      <CircularProgress color="inherit" />
+    </Box>
+  }
+
   return (
     <Box className='todo-container' bgcolor={theme.palette.background.default} >
       <Box sx={{ height: '100%' }}>
         <Box className='todo-header'>
-          <Typography className='todo-title' color={theme.palette.text.primary}>{todo.title}</Typography>
-          <IconButton className='todo-add-icon' onClick={handleOpenModal} >
-              <AddCircleOutlineIcon fontSize='large' />
+          <Link to="/">
+            <IconButton className='todo-back-icon' >
+              <ArrowBackIcon fontSize='large' />
             </IconButton>
+          </Link>
+          <Typography className='todo-title' color={theme.palette.text.primary}>{title}</Typography>
+          <IconButton className='todo-add-icon' onClick={handleOpenModal} >
+            <AddCircleOutlineIcon fontSize='large' />
+          </IconButton>
         </Box>
-        <DataTable
-          todos={todos}
-          onCheck={handleCheck}
-        />
+        {todos ?
+          <DataTable
+            todos={todos}
+            handleEditTodo={handleEditTodo}
+            handleDeleteTodo={handleDeleteTodo}
+          />
+          : <Typography className='todo-noTasks' color={theme.palette.text.primary}>{noTasks}</Typography>
+        }
       </Box>
-      <AddTodoModal open={openAddModal} onClose={handleCloseModal} />
+      <AddTodoModal open={openAddModal} onClose={handleCloseModal} handleAddTask={handleAddTask} />
     </Box>
   )
 }

@@ -1,13 +1,24 @@
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
-import Paper from '@mui/material/Paper';
-import Checkbox from '@mui/material/Checkbox';
+import { useState } from 'react';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  Checkbox,
+  TableSortLabel,
+  IconButton
+} from '@mui/material';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
+import EditModal from './editModal';
 
-export default function DataTable({ todos, onCheck }) {
+export default function DataTable({ todos, handleEditTodo, handleDeleteTodo }) {
+  const [openEditModal, setOpenEditModal] = useState(false);
+  const [selectedTask, setSelectedTask] = useState(null);
+  const [sortByStatus, setSortByStatus] = useState('asc');
 
   const rows = todos ? todos.map(todo => ({
     id: todo._id,
@@ -15,29 +26,72 @@ export default function DataTable({ todos, onCheck }) {
     done: todo.done
   })) : [];
 
+  const handleOpenEditModal = (task) => {
+    setSelectedTask(task);
+    setOpenEditModal(true);
+  };
+
+  const handleCloseEditModal = () => {
+    setSelectedTask(null);
+    setOpenEditModal(false);
+  };
+
+  const handleSortStatus = () => {
+    setSortByStatus(sortByStatus === 'asc' ? 'desc' : 'asc');
+  };
+
+  const sortedRows = sortByStatus === 'asc' ? [...todos].sort((a, b) => a.done - b.done) : [...todos].sort((a, b) => b.done - a.done);
+
   return (
-    <TableContainer component={Paper} style={{ height: '65%', width: '90%', margin: '0 auto' }}>
-      <Table>
-        <TableHead>
-          <TableRow>
-            <TableCell>Done</TableCell>
-            <TableCell align="right">Task</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {rows.map((row) => (
-            <TableRow
-              key={row.id}
-              sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-            >
-              <TableCell component="th" scope="row">
-                <Checkbox checked={row.done} onChange={() => onCheck(row.id, !row.done)} />
+    <>
+      <TableContainer component={Paper} style={{ height: '65%', width: '90%', margin: '0 auto', borderRadius: '15px' }}>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell>
+                <TableSortLabel
+                  active={true}
+                  direction={sortByStatus}
+                  onClick={handleSortStatus}
+                >
+                  Status
+                </TableSortLabel>
               </TableCell>
-              <TableCell align="right" sx={{ width: '500px' }}>{row.text}</TableCell>
+              <TableCell align="right">Task</TableCell>
+              <TableCell></TableCell>
+              <TableCell></TableCell>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </TableContainer>
+          </TableHead>
+          <TableBody>
+            {sortedRows.map((row) => (
+              <TableRow
+                key={row.id}
+                sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+              >
+                <TableCell component="th" scope="row">
+                  <Checkbox checked={row.done} onChange={() => handleEditTodo(row.id, { done: !row.done })} />
+                </TableCell>
+                <TableCell align="right" sx={{ width: '500px' }}>{row.text}</TableCell>
+                <TableCell>
+                  <IconButton onClick={() => handleOpenEditModal(row)}>
+                    <EditIcon />
+                  </IconButton>
+                </TableCell>
+                <TableCell>
+                  <IconButton onClick={() => handleDeleteTodo(row.id)}>
+                    <DeleteIcon />
+                  </IconButton>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+      <EditModal
+        selectedTask={selectedTask}
+        open={openEditModal}
+        onClose={handleCloseEditModal}
+        handleEditTodo={handleEditTodo} />
+    </>
   );
 }

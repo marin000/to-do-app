@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Home from './pages/home';
 import Todo from './pages/todo';
@@ -7,7 +7,11 @@ import { darkTheme } from "./themes/dark";
 import { lightTheme } from "./themes/light";
 
 export default function App() {
-  const [currentTheme, setCurrentTheme] = useState(darkTheme);
+  const [currentTheme, setCurrentTheme] = useState(localStorage.getItem('theme') === 'light' ? lightTheme : darkTheme);
+
+  useEffect(() => {
+    localStorage.setItem('theme', currentTheme === lightTheme ? 'light' : 'dark');
+  }, [currentTheme]);
 
   const toggleTheme = () => {
     setCurrentTheme((prevTheme) => (prevTheme === darkTheme ? lightTheme : darkTheme));

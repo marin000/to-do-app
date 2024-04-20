@@ -2,6 +2,7 @@ const Todos = require('../Models/Todos');
 const { validationResult } = require('express-validator');
 const { v4: uuidv4 } = require('uuid');
 const errorMessages = require('../constants/errorMessages');
+const infoMessages = require('../constants/infoMessages');
 const { sendSMS } = require('../services/sms');
 
 const create = async (req, res) => {
@@ -81,9 +82,27 @@ async function update(req, res) {
   }
 }
 
+const deleteTodo = async (req, res) => {
+  try {
+    const errors = validationResult(req)
+    if (!errors.isEmpty()) {
+      return res.status(403).json({ errors: errors.array() });
+    }
+
+    const deletedTodo = await Todos.findByIdAndDelete(req.params.id);
+    if (!deletedTodo) {
+      return res.status(404).json({ error: errorMessages.TODO_NOT_FOUND });
+    }
+    res.status(200).json({ message: infoMessages.TODO_DELETED });
+  } catch (err) {
+    res.status(500).json({ error: err.message, metadata: err.stack });
+  }
+}
+
 module.exports = {
   create,
   fetch,
   getById,
-  update
+  update,
+  deleteTodo
 };

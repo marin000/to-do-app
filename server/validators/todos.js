@@ -21,7 +21,7 @@ exports.validate = (method) => {
           .isIn(['ASC', 'DESC']).withMessage(message.SORT_INVALID)
       ]
     }
-    case 'getTodoById': {
+    case 'checkId': {
       return [
         param('id')
           .exists().withMessage(message.ID_REQUIRED)

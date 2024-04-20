@@ -1,15 +1,16 @@
 import { useState, useEffect } from "react";
 import { Box, Typography, useTheme, IconButton } from "@mui/material";
-import TaskIcon from '@mui/icons-material/Task';
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import { todo } from "../../constants/todo";
 import apiTodo from '../../api/todo';
 import DataTable from "../../components/dataTable";
 import './todo.css';
+import AddTodoModal from "../../components/addTodoModal";
 
 export default function Todo() {
   const theme = useTheme();
-  const { title } = todo;
   const [todos, setTodos] = useState(null);
+  const [openAddModal, setOpenAddModal] = useState(false);
 
   useEffect(() => {
     apiTodo.getTodos()
@@ -34,20 +35,29 @@ export default function Todo() {
       });
   }
 
+  const handleOpenModal = () => {
+    setOpenAddModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setOpenAddModal(false);
+  };
+
   return (
     <Box className='todo-container' bgcolor={theme.palette.background.default} >
       <Box sx={{ height: '100%' }}>
         <Box className='todo-header'>
-          <IconButton color={theme.palette.primary.main} style={{ marginBottom: '20px' }}>
-            <TaskIcon fontSize='large' />
-          </IconButton>
-          <Typography className='todo-title' color={theme.palette.text.primary}>{title}</Typography>
+          <Typography className='todo-title' color={theme.palette.text.primary}>{todo.title}</Typography>
+          <IconButton className='todo-add-icon' onClick={handleOpenModal} >
+              <AddCircleOutlineIcon fontSize='large' />
+            </IconButton>
         </Box>
         <DataTable
           todos={todos}
           onCheck={handleCheck}
         />
       </Box>
+      <AddTodoModal open={openAddModal} onClose={handleCloseModal} />
     </Box>
   )
 }

@@ -10,11 +10,16 @@
   display: flex;
   align-items: center;
   margin-top: 100px !important;
-  margin-left: 30px !important;
+  margin-left: 50px !important;
 }
 
 .todo-title {
   font-size: 30px !important;
   font-weight: 300 !important;
   margin-bottom: 20px !important;
+}
+
+.todo-add-icon {
+  margin-bottom: 20px !important;
+  margin-left: 20px !important;
 }

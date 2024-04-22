@@ -1,0 +1,154 @@
+components:
+  schemas:
+    Todos:
+      type: object
+      required:
+        - text
+      properties:
+        id:
+          type: string
+          description: UUID
+        text:
+          type: string
+          description: Text of the task
+        done:
+          type: boolean
+          description: Task is done or not
+      example:
+        text: Buy a gift for John
+        done: false
+
+info:
+  title: "Todos API"
+  description: "API for managing todos"
+
+tags:
+  name: Todos
+  description: Endpoints for managing todos
+
+schemes:
+  - "http"
+  - "https"
+
+paths: 
+  /api/todos: 
+    post: 
+      summary: Create a new taks
+      tags: [Todos]
+      requestBody:
+          required: true
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Todos'
+      responses:
+        201:
+          description: New task created.
+          schema:
+            $ref: "#/components/schemas/Todos"
+        400:
+          description: Problem with text input
+        403:
+          description: Text is too short
+        500:
+          description: An error occurred while processing the request on the server
+
+    get:
+      summary: Fetch all tasks
+      tags: [Todos]
+      responses:
+        200:
+          description: Successfully get all tasks.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Todos'
+        403:
+          description: Sort invalid
+        500:
+          description: An error occurred while processing the request on the server
+
+  /api/todos/{id}:
+    get: 
+      summary: Get task by id
+      parameters:
+      - name: id
+        in: path
+        description: ID of the task
+        required: true
+        schema:
+          type: string
+      tags:
+        - Todos
+      responses:
+        200:
+          description: Successfully get todo.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Todos'
+        403:
+          description: Invalid UUID
+        404:
+          description: Todo not found
+        500:
+          description: An error occurred while processing the request on the server
+
+    put: 
+      summary: Update task
+      parameters:
+      - name: id
+        in: path
+        description: ID of the task
+        required: true
+        schema:
+          type: string
+      tags:
+        - Todos
+      requestBody:
+        description: >
+          Tasks information to update. Include the task's ID in the request params.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Todos'
+            example:
+              text: "New text"
+              done: true
+      responses:
+        200:
+          description: Todo updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Todos"
+        403:
+          description: Invalid UUID
+        404:
+          description: Todo not found
+        500:
+          description: An error occurred while processing the request on the server
+
+    delete:
+      summary: Delete a task
+      parameters:
+        - name: id
+          in: path
+          description: ID of the task
+          required: true
+          schema:
+            type: string
+      tags:
+        - Todos
+      responses:
+        200:
+          description: Todo deleted successfully
+        403:
+          description: Invalid UUID
+        404:
+          description: Todo not found
+        500:
+          description: An error occurred while processing the request on the server

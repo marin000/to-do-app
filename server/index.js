@@ -1,15 +1,20 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const swaggerUI = require('swagger-ui-express');
+const swaggerJsDoc = require('swagger-jsdoc');
+const swaggerOptions = require('./docs/options-config');
 const app = express();
 const config = require('./config/index');
 const dbMessages = require('./constants/dbMessages');
 require('dotenv')
   .config();
 
+const specs = swaggerJsDoc(swaggerOptions.options)
 const router = require('./router');
 
 app.use(express.json());
+app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(specs))
 app.use(cors());
 app.use(router);
 

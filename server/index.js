@@ -32,3 +32,5 @@ mongoose.connect(dbUrl, connectionParams)
 app.listen(port, function () {
   console.log(PORT_LISTENING + port);
 });
+
+module.exports = app;

@@ -40,7 +40,7 @@ export default function DataTable({ todos, handleEditTodo, handleDeleteTodo }) {
     setSortByStatus(sortByStatus === 'asc' ? 'desc' : 'asc');
   };
 
-  const sortedRows = sortByStatus === 'asc' ? [...todos].sort((a, b) => a.done - b.done) : [...todos].sort((a, b) => b.done - a.done);
+  const sortedRows = sortByStatus === 'asc' ? [...rows].sort((a, b) => a.done - b.done) : [...rows].sort((a, b) => b.done - a.done);
 
   return (
     <>

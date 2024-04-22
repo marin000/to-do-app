@@ -25,7 +25,7 @@ exports.validate = (method) => {
       return [
         param('id')
           .exists().withMessage(message.ID_REQUIRED)
-          .custom((value) => {console.log(value);
+          .custom((value) => {
             if (!uuid.validate(value)) {
               throw new Error(message.INVALID_ID);
             }

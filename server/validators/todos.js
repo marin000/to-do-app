@@ -1,5 +1,5 @@
 const { body, query, param } = require('express-validator');
-const { v4: isUUID } = require('uuid');
+const uuid = require('uuid');
 const message = require('../constants/validatorMessages');
 
 exports.validate = (method) => {
@@ -25,8 +25,8 @@ exports.validate = (method) => {
       return [
         param('id')
           .exists().withMessage(message.ID_REQUIRED)
-          .custom((value) => {
-            if (!isUUID(value)) {
+          .custom((value) => {console.log(value);
+            if (!uuid.validate(value)) {
               throw new Error(message.INVALID_ID);
             }
             return true;
@@ -38,7 +38,7 @@ exports.validate = (method) => {
         param('id')
           .exists().withMessage(message.ID_REQUIRED)
           .custom((value) => {
-            if (!isUUID(value)) {
+            if (!uuid.validate(value)) {
               throw new Error(message.INVALID_ID);
             }
             return true;
